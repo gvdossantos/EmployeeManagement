@@ -21,7 +21,7 @@ public class AdminSetupRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        String adminEmail = "admin@123.com";
+        String adminEmail = "admin123@gmail.com";
 
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
 

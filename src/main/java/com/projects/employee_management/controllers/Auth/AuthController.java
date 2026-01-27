@@ -1,16 +1,15 @@
 package com.projects.employee_management.controllers.Auth;
 
-import com.projects.employee_management.dto.LoginRequest;
-import com.projects.employee_management.dto.LoginResponse;
-import com.projects.employee_management.dto.RegisterDTO;
-import com.projects.employee_management.dto.UserResponse;
+import com.projects.employee_management.dto.*;
 import com.projects.employee_management.repositories.UserRepository;
+import com.projects.employee_management.services.RefreshTokenService;
 import com.projects.employee_management.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -30,38 +29,29 @@ import java.time.Instant;
 @AllArgsConstructor
 public class AuthController {
 
+    private static final long ACCESS_TOKEN_EXPIRY = 3600L;
 
     private final JwtEncoder jwtEncoder;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
 
         var user = userRepository.findByEmail(loginRequest.email());
 
-        if (user.isEmpty() ||
-                !user.get().passwordMatches(loginRequest.password(), passwordEncoder)) {
+        if (user.isEmpty() || !user.get().passwordMatches(loginRequest.password(), passwordEncoder)) {
             throw new BadCredentialsException("Usuário ou senha inválido");
         }
 
-        var expiresIn = 3600L;
-        var claims = JwtClaimsSet.builder()
-                .issuer("apiemployee")
-                .subject(user.get().getId().toString())
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(expiresIn))
-                .claim("roles", user.get().getAuthorities().stream()
-                        .map(a -> a.getAuthority())
-                        .toList())
-                .build();
+        var userDetails = userService.loadUserByUsername(loginRequest.email());
+        var accessToken = generateAccessToken(userDetails);
+        var refreshToken = refreshTokenService.generateRefreshToken(user.get().getId());
 
-
-        var JwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        return ResponseEntity.ok(new LoginResponse(JwtValue, expiresIn));
+        return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken,ACCESS_TOKEN_EXPIRY));
     }
 
 
@@ -84,6 +74,44 @@ public class AuthController {
         return ResponseEntity.created(uri).build();
     }
 
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthenticationResponse> refresh(@RequestBody @Valid RefreshTokenRequest request) {
+
+        String username = refreshTokenService.validateRefreshTokenAndGetUsername(request.refreshToken());
+        UserDetails userDetails = userService.loadUserByUsername(username);
+
+        var accessToken = generateAccessToken(userDetails);
+
+        AuthenticationResponse response = new AuthenticationResponse();
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(request.refreshToken());
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody @Valid RefreshTokenRequest request) {
+        refreshTokenService.deleteByToken(request.refreshToken());
+        return ResponseEntity.noContent().build();
+    }
+
+
+    private String generateAccessToken( UserDetails userDetails) {
+
+        var claims = JwtClaimsSet.builder()
+                .issuer("apiemployee")
+                .subject(userDetails.getUsername())
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(ACCESS_TOKEN_EXPIRY))
+                .claim("roles", userDetails.getAuthorities().stream()
+                        .map(a -> a.getAuthority())
+                        .toList())
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
 
 }
 
