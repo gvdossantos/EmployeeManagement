@@ -15,6 +15,7 @@ O intuito desse projeto é aplicar conhecimentos de:
 - Integração com PostgreSQL
 - Swagger UI
 - Implementação de criptografia assimétrica utilizando RSA (public/private keys) para proteção de dados sensíveis
+- Refresh Token e Logout
 
 ---
 
@@ -59,6 +60,13 @@ A aplicação utiliza **Spring Security + OAuth2 Resource Server (JWT)**.
 - O token deve ser enviado no header `Authorization: Bearer <token>`
 - Somente endpoints públicos podem ser acessados sem autenticação
 
+### 🔄 Refresh Token
+- Endpoint `/auth/refresh` permite gerar um novo Access Token usando um Refresh Token válido
+- Refresh Tokens são armazenados no banco e podem ser invalidados pelo logout
+
+### 🚪 Logout
+- Endpoint `/auth/logout` invalida o Refresh Token do usuário, impedindo que novos Access Tokens sejam gerados
+
 ### 👮 Autorização
 - Controle de acesso por **roles**
 - Uso de `@PreAuthorize`
@@ -76,12 +84,14 @@ A aplicação utiliza **Spring Security + OAuth2 Resource Server (JWT)**.
 
 ### 🔐 Autenticação
 
-| Método | Endpoint         | Descrição                |
-|--------|------------------|--------------------------|
-| POST   | `/auth/register` | Registro de usuário      |
-| POST   | `/auth/login`    | Login e geração do token |
+| Método | Endpoint         | Descrição                                            |
+|--------|------------------|------------------------------------------------------|
+| POST   | `/auth/register` | Registro de usuário                                  |
+| POST   | `/auth/login`    | Login e geração do token                             |
+| POST   | `/auth/refresh`  | Gera novo access token usando o refresh token válido |
+| POST   | `/auth/logout`   | Invalida o refresh token do usuário (logout)         |
 
-### 🏢 DEPARTMENTS 
+### 🏢 Departments
 
 | Método | Endpoint          | Acesso  | Descrição                    |
 |--------|-------------------|---------|------------------------------|
@@ -103,8 +113,8 @@ A aplicação utiliza **Spring Security + OAuth2 Resource Server (JWT)**.
 
 ##  Melhorias Futuras
 
-- [ ] Refresh Token
-- [ ] Logout
+- [✔️] Refresh Token
+- [✔️] Logout
 - [ ] Testes unitários e de integração
 - [ ] Dockerização
 - [ ] Docker Compose  
