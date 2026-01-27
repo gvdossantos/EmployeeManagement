@@ -1,0 +1,5 @@
+CREATE TABLE tb_user (
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(150) NOT NULL
+);

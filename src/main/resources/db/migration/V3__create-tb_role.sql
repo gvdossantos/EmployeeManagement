@@ -1,0 +1,3 @@
+CREATE TABLE tb_role(
+    id BIGSERIAL PRIMARY KEY,
+    authority VARCHAR(25) NOT NULL UNIQUE);
