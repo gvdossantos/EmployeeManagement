@@ -16,6 +16,7 @@ O intuito desse projeto é aplicar conhecimentos de:
 - Swagger UI
 - Implementação de criptografia assimétrica utilizando RSA (public/private keys) para proteção de dados sensíveis
 - Refresh Token e Logout
+- Testes unitários utilizando JUnit e Mockito
 
 ---
 
@@ -115,6 +116,6 @@ A aplicação utiliza **Spring Security + OAuth2 Resource Server (JWT)**.
 
 - [✔️] Refresh Token
 - [✔️] Logout
-- [ ] Testes unitários e de integração
+- [✔️] Testes unitários com JUnit e Mockito
 - [ ] Dockerização
 - [ ] Docker Compose  

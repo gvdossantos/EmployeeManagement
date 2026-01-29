@@ -41,6 +41,7 @@ public class RefreshTokenService {
     }
 
     public String validateRefreshTokenAndGetUsername(String givenToken) {
+
         RefreshToken refreshToken = refreshTokenRepository.findByToken(givenToken)
                 .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token inválido"));
 
