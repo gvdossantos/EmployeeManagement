@@ -35,16 +35,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EmployeeControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @MockitoBean
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
 
     @MockitoBean
-    JwtDecoder jwtDecoder;
+    private JwtDecoder jwtDecoder;
 
     @MockitoBean
-    JwtEncoder jwtEncoder;
+    private JwtEncoder jwtEncoder;
 
 
     private Long existingId;

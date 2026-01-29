@@ -1,4 +1,4 @@
-package com.projects.employee_management.controllers.Auth;
+package com.projects.employee_management.controllers.auth;
 
 import com.projects.employee_management.dto.*;
 import com.projects.employee_management.repositories.UserRepository;
