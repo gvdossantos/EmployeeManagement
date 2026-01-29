@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,7 +54,7 @@ public class TokenServiceTest {
     @Test
     public void generateRefreshTokenShouldReturnNewTokenWhenIdExits() {
 
-       ArgumentCaptor<RefreshToken> tokenCaptor = ArgumentCaptor.forClass(RefreshToken.class);
+        ArgumentCaptor<RefreshToken> tokenCaptor = ArgumentCaptor.forClass(RefreshToken.class);
 
         String result = service.generateRefreshToken(existingId);
         Assertions.assertNotNull(result);

@@ -1,0 +1,5 @@
+*.war
+*.class
+.idea/
+*.iml
+.git
